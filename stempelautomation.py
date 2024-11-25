@@ -3,7 +3,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
 import random
 import time
-#import sys
 import os
 
 # Konstanten
@@ -12,7 +11,7 @@ ZEITERFASSUNG_BEENDEN_LINK = "https://lernplattform.gfn.de/?stoppen=1"
 
 # Variablen
 uhrzeit_starten_H = 8 # Stunde Einstempeln
-uhrzeit_starten_M = random.randint(18, 24) # Timerange zum einstempeln um Automation zu verschleiern.
+uhrzeit_starten_M = random.randint(18, 27) # Timerange zum einstempeln um Automation zu verschleiern.
 uhrzeit_beenden_H = 16 # Stunde Ausstempeln
 uhrzeit_beenden_M = random.randint(32, 36) # Timerange zum ausstempeln um Automation zu verschleiern.
 
@@ -134,7 +133,11 @@ def popup_handle():
 
 def zeiterfassung_starten():
 	try:
-		time.sleep(1)	
+		time.sleep(1)
+		stempler_rausholen = driver.find_element("css selector", "#topofscroll > div.drawer-toggles.d-flex > div > button")
+		stempler_rausholen.click()
+		time.sleep(0.3)
+
 		if "Startzeit" not in driver.page_source:
 			if ort == 1:
 				zeit_radio_homeoffice = driver.find_element("css selector", "#flexRadioDefault1")
