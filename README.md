@@ -10,3 +10,11 @@ Im Stammordner sollte die geckodriver.exe von Mozilla liegen.
 Das Programm läuft mit Selenium, einem Programm um Webbrowser bzw deren Userinteraktionen zu automatisieren.
 
 `pip install selenium`
+
+
+# Disclaimer
+
+> **Wichtiger Hinweis:**  
+> Diese Software ist **nur eine Demo** und dient ausschließlich Demonstrationszwecken.  
+> Sie darf **nicht** für rechtlich verbindliche oder produktive Zwecke eingesetzt werden.  
+> Der Entwickler übernimmt keinerlei Haftung für Schäden oder Verluste, die aus der Nutzung dieser Software resultieren.
