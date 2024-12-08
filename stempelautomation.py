@@ -19,6 +19,7 @@ uhrzeit_beenden_M = random.randint(32, 36) # Timerange zum ausstempeln um Automa
 
 driver = None
 bot = None
+system_running = True
 
 # Funktionen
 def pause(kategorie):
@@ -33,14 +34,6 @@ def pause(kategorie):
 		warten = random.uniform(3.68, 3.98)
 
 	time.sleep(warten)
-
-async def send_telegram_message(empfaenger_ID, message):
-    try:
-        await bot.send_message(chat_id = empfaenger_ID, text = message)
-        print("Telegram-Message versandt.")
-
-    except Exception as error:
-        print(f"Fehler: {error}")
 
 def abfrage_userdaten():
 	global email
@@ -130,6 +123,14 @@ def telegram_bot():
 	global bot
 	bot = Bot(token = telegram_api_token)
 
+async def send_telegram_message(empfaenger_ID, message):
+    try:
+        await bot.send_message(chat_id = empfaenger_ID, text = message)
+        print("Telegram-Message versandt.")
+
+    except Exception as error:
+        print(f"Fehler: {error}")
+
 def browser_und_login():
 	global driver
 
@@ -198,32 +199,48 @@ def zeiterfassung_starten():
 		stempler_rausholen.click()
 		time.sleep(0.3)
 
-		if "Startzeit" not in driver.page_source:
-			if ort == 1:
-				zeit_radio_homeoffice = driver.find_element("css selector", "#flexRadioDefault1")
-				zeit_radio_homeoffice.click()                                
-				pause(2)
-				ask_location = False
+		aktueller_Wochentag = int(time.strftime("%u")) # 1 = Montag - 7 = Sonntag
+		if aktueller_Wochentag <= 5: # Zeiterfassung soll natürlich nur zwischen Montag und Freitag gestartet werden.
+			if aktueller_Wochentag == 1:
+				ort = ort_Mo
+			elif aktueller_Wochentag == 2:
+				ort = ort_Di
+			elif aktueller_Wochentag == 3:
+				ort = ort_Mi
+			elif aktueller_Wochentag == 4:
+				ort = ort_Do
+			elif aktueller_Wochentag == 5:
+				ort = ort_Fr
 
-			elif ort == 2:
-				zeit_radio_standort = driver.find_element("css selector", "#flexRadioDefault2")
-				zeit_radio_standort.click()
-				pause(2)
-				ask_location = False
+			if "Startzeit" not in driver.page_source:
+				if ort == 1:
+					zeit_radio_homeoffice = driver.find_element("css selector", "#flexRadioDefault1")
+					zeit_radio_homeoffice.click()                                
+					pause(2)
+
+				elif ort == 2:
+					zeit_radio_standort = driver.find_element("css selector", "#flexRadioDefault2")
+					zeit_radio_standort.click()
+					pause(2)
+
+				else:
+					return False
+
+				zeit_submit_button = driver.find_element("css selector", "input[type='submit']")
+				zeit_submit_button.click()
+
+				pause(3)
+				asyncio.run(send_telegram_message(telegram_ID, "Zeiterfassung gestartet!"))
+				return True
 
 			else:
-				return False
-
-			zeit_submit_button = driver.find_element("css selector", "input[type='submit']")
-			zeit_submit_button.click()
-
-			pause(3)
-			return True
-
+				print("Die Zeiterfassung ist bereits gestartet worden.")
+		
 		else:
-			print("Die Zeiterfassung ist bereits gestartet worden.")
+			print("Wochenendtag. Heute keine Zeiterfassung!")
 
 	except Exception as error:
+		asyncio.run(send_telegram_message(telegram_ID, "Zeiterfassung starten FEHLER!!!"))
 		print("zeiterfassung_starten Fehler!", error)
 		return False
 
@@ -231,13 +248,17 @@ def zeiterfassung_beenden():
 	try:
 		if "Endzeit" not in driver.page_source:
 			driver.get(ZEITERFASSUNG_BEENDEN_LINK) # Ruft den Link zum Stoppen der Zeiterfassung auf.
+			asyncio.run(send_telegram_message(telegram_ID, "Zeiterfassung beendet!"))
 			pause(3)
+			return True
 
 		else:
 			print("Du bist bereits abgemeldet!")
 
 	except Exception as error:
+		asyncio.run(send_telegram_message(telegram_ID, "Zeiterfassung beenden FEHLER!!!"))
 		print("zeiterfassung_beenden Fehler!", error)
+		return False
 
 # Funktion startet die Zeiterfasssung nur innerhalb eines Zeitfenster von 10 Minuten am Tag.
 # So kann man sorglos später am Tag seinen Pc starten ohne das er Sich in die Zeit einstempelt.
@@ -268,16 +289,24 @@ def warten_auf_uhrzeit(hour, minute):
 try:
 	os.system("cls") # Bereinigt die Terminalausgabe.
 	if abfrage_userdaten() == True:
-		warten_auf_uhrzeit(uhrzeit_starten_H, uhrzeit_starten_M)
-		if browser_und_login() == True:
-			if zeiterfassung_starten() == True:
-				driver.quit()
+		telegram_bot()
 
-				warten_auf_uhrzeit(uhrzeit_beenden_H, uhrzeit_beenden_M)
-				if browser_und_login() == True:
+		while system_running == True:
+			# Einstempeln
+			warten_auf_uhrzeit(uhrzeit_starten_H, uhrzeit_starten_M) # Vor Arbeitsbegin
+			if browser_und_login() == True:
+				pause(2)
+				if zeiterfassung_starten() == True:
 					pause(2)
-					zeiterfassung_beenden()
-					pause(2)
+					driver.quit()
+
+					# Ausstempeln
+					warten_auf_uhrzeit(uhrzeit_beenden_H, uhrzeit_beenden_M) # Nach Feierabend
+					if browser_und_login() == True:
+						pause(2)
+						if zeiterfassung_beenden() == True:
+							pause(2)
+							driver.quit()
 
 except Exception as error:
 	print("Programm Fehler!", error)
