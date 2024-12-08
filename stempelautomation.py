@@ -45,7 +45,11 @@ async def send_telegram_message(empfaenger_ID, message):
 def abfrage_userdaten():
 	global email
 	global pw
-	global ort
+	global ort_1
+	global ort_2
+	global ort_3
+	global ort_4
+	global ort_5
 	global telegram_api_token
 	global telegram_ID
 
@@ -56,8 +60,27 @@ def abfrage_userdaten():
 			email = input("Gib deine Emailadresse ein: ")
 			pw = input("Gib das Passwort ein: ")
 			print()
+			print("Folgend werden deine Homeoffice und Standorttage konfiguriert.")
+			print()
+			print("Montag:")
 			print("Homeoffice = 1 / Standort = 2")
-			ort = int(input("Gib den Ort als Zahl ein: "))
+			ort_1 = int(input("Gib den Ort als Zahl ein: "))
+			print()
+			print("Dienstag:")
+			print("Homeoffice = 1 / Standort = 2")
+			ort_2 = int(input("Gib den Ort als Zahl ein: "))
+			print()
+			print("Mittwoch:")
+			print("Homeoffice = 1 / Standort = 2")
+			ort_3 = int(input("Gib den Ort als Zahl ein: "))
+			print()
+			print("Donnerstag:")
+			print("Homeoffice = 1 / Standort = 2")
+			ort_4 = int(input("Gib den Ort als Zahl ein: "))
+			print()
+			print("Freitag:")
+			print("Homeoffice = 1 / Standort = 2")
+			ort_5 = int(input("Gib den Ort als Zahl ein: "))
 			print()
 			print("Um Benachrichtigungen unterwegs zu erhalten ob der Login erfolgreich durchgeführt wurde.")
 			print("Solle das nicht gewünscht sein einfach leer lassen und Enter drücken.")
@@ -70,13 +93,17 @@ def abfrage_userdaten():
 			with open("credentials.py", "w") as datei:
 				datei.write('email = "' + email + '" \n')
 				datei.write('pw = "' + pw + '" \n')
-				datei.write('ort = "' + str(ort) + '" \n')
+				datei.write('ort_1 = "' + str(ort_1) + '" \n')
+				datei.write('ort_2 = "' + str(ort_2) + '" \n')
+				datei.write('ort_3 = "' + str(ort_3) + '" \n')
+				datei.write('ort_4 = "' + str(ort_4) + '" \n')
+				datei.write('ort_5 = "' + str(ort_5) + '" \n')
 				datei.write('tat = "' + telegram_api_token + '" \n')
-				datei.write('tid = "' + str(telegram_ID + '"'))
+				datei.write('tid = "' + str(telegram_ID) + '"')
 
 			print("Benutzerdaten erfolgreich in credentials.py gespeichert. [Achtung Klartext!]")
 			print()
-			print("Solltest du deinen Ort mal verändern wollen, lösche einfach die credentials.py \noder änder die Zahl für den Ort darin entsprechend.")
+			print("Solltest du mal etwas verändern wollen, lösche einfach die credentials.py \noder ändere den Inhalt entsprechend.")
 			input("Weiter mit Enter!")
 			return True
 
