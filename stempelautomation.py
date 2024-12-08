@@ -117,7 +117,7 @@ def abfrage_userdaten():
 			ort_Mi = int(cds.ort_Mi)
 			ort_Do = int(cds.ort_Do)
 			ort_Fr = int(cds.ort_Fr)
-			telegram_api_token = int(cds.tat) # Telegram Access Token (Bot)
+			telegram_api_token = cds.tat # Telegram Access Token (Bot)
 			telegram_ID = int(cds.tid) # Telegram ID (User)
 
 			return True
