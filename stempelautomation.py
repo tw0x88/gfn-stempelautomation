@@ -1,6 +1,8 @@
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
+from telegram import Bot
+import asyncio
 import random
 import time
 import os
@@ -16,6 +18,7 @@ uhrzeit_beenden_H = 16 # Stunde Ausstempeln
 uhrzeit_beenden_M = random.randint(32, 36) # Timerange zum ausstempeln um Automation zu verschleiern.
 
 driver = None
+bot = None
 
 # Funktionen
 def pause(kategorie):
@@ -31,10 +34,20 @@ def pause(kategorie):
 
 	time.sleep(warten)
 
+async def send_telegram_message(empfaenger_ID, message):
+    try:
+        await bot.send_message(chat_id = empfaenger_ID, text = message)
+        print("Telegram-Message versandt.")
+
+    except Exception as error:
+        print(f"Fehler: {error}")
+
 def abfrage_userdaten():
 	global email
 	global pw
 	global ort
+	global telegram_api_token
+	global telegram_ID
 
 	try:
 		if not os.path.exists("credentials.py"):
@@ -46,11 +59,20 @@ def abfrage_userdaten():
 			print("Homeoffice = 1 / Standort = 2")
 			ort = int(input("Gib den Ort als Zahl ein: "))
 			print()
+			print("Um Benachrichtigungen unterwegs zu erhalten ob der Login erfolgreich durchgeführt wurde.")
+			print("Solle das nicht gewünscht sein einfach leer lassen und Enter drücken.")
+			telegram_api_token = input("Gib das Telegram API Token ein: ")
+			print()
+			print("Deine Telegram ID kannst du auch leer lassen wenn du keine Benachrichtigungen wünschst.")
+			telegram_ID = int(input("Gib deine Telegram-ID ein: "))
+			print()
 
 			with open("credentials.py", "w") as datei:
 				datei.write('email = "' + email + '" \n')
 				datei.write('pw = "' + pw + '" \n')
-				datei.write('ort = "' + str(ort) + '"')
+				datei.write('ort = "' + str(ort) + '" \n')
+				datei.write('tat = "' + telegram_api_token + '" \n')
+				datei.write('tid = "' + str(telegram_ID + '"'))
 
 			print("Benutzerdaten erfolgreich in credentials.py gespeichert. [Achtung Klartext!]")
 			print()
@@ -64,11 +86,18 @@ def abfrage_userdaten():
 			email = cds.email
 			pw = cds.pw
 			ort = int(cds.ort)
+			telegram_api_token = int(cds.tat)
+			telegram_ID = int(cds.tid)
+
 			return True
 
 	except Exception as error:
 		print("abfrage_userdaten Fehler!", error)
 		return False
+
+def telegram_bot():
+	global bot
+	bot = Bot(token = telegram_api_token)
 
 def browser_und_login():
 	global driver
