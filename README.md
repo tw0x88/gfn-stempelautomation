@@ -37,7 +37,3 @@ Dies ist **OPTIONAL**
 > 3. Hol dir den API Token.
 > 4. Sende eine Nachricht an deinen Bot.
 > 5. Im Repository liegt eine telegramIDcheker.py, führe sie aus um deine Telegram-ID auszulesen.
-> 5. 
-> 5. 
-> 5. 
-> 5. 
