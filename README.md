@@ -3,9 +3,9 @@ Python- und Selenium-basiertes Tool zur Automatisierung der Stempelzeiten der gf
 Zeiterfassung startet morgens randomisiert zwischen 8:18 Uhr und 8:27 Uhr.
 Zeiterfassung endet abends randomisiert zwischen 16:32 Uhr und 16:36 Uhr.
 
-In der aktuellen Version ist das Programm dafür gedacht dauerhaft zu laufen und einem so die Arbeit immer abnimmt.
+In der aktuellen Version ist das Programm dazu gedacht dauerhaft zu laufen und einem so die Arbeit immer abzunehmen.
 Dazu kommt jetzt eine Benachrichtigung über den **Messengerdienst Telegram**, der sagt ob man erfolgreich Ein- bzw. Ausgestempelt ist.
-Dies ist **OPTIONAL**
+Dies ist **OPTIONAL**.
 
 # Disclaimer
 
@@ -30,7 +30,7 @@ Dies ist **OPTIONAL**
 >
 > `pip install python-telegram-bot`
 
-# Telegram Setup
+# Telegram Bot Setup
 
 > 1. Suche auf Telegram nach dem Telegram eigenen Service "BotFather".
 > 2. Lege einen eigenen Bot an. /newbot
