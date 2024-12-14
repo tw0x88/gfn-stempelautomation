@@ -36,7 +36,7 @@ def pause(kategorie):
 def send_telegram_message(message):
     if telegram_api_token != "" or telegram_ID != "": # Wenn der User keine Telegram Notifications wünscht.
         url = f"https://api.telegram.org/bot{telegram_api_token}/sendMessage"
-        data = {"chat_id": telegram_ID, "text": message}
+        data = {"chat_id": telegram_ID, "text": time.strftime("[ %d.%m.%y  %H:%M ]\n") + message}
         try:
             response = requests.post(url, data=data)
             if response.status_code == 200:
@@ -122,7 +122,12 @@ def abfrage_userdaten():
             ort_Do = int(cds.ort_Do)
             ort_Fr = int(cds.ort_Fr)
             telegram_api_token = cds.tat # Telegram Access Token (Bot)
-            telegram_ID = int(cds.tid) # Telegram ID (User)
+
+            if cds.tid == "":
+                telegram_ID = ""
+            
+            else:
+                telegram_ID = int(cds.tid) # Telegram ID (User)
 
             return True
 
@@ -288,6 +293,8 @@ def warten_auf_uhrzeit(hour, minute):
 try:
     os.system("cls") # Bereinigt die Terminalausgabe.
     if abfrage_userdaten() == True:
+        print("Telegram-Funktionstest.")
+        send_telegram_message("Funktionstest!")
         while system_running == True:
             # Einstempeln
             warten_auf_uhrzeit(uhrzeit_starten_H, uhrzeit_starten_M) # Vor Arbeitsbegin
