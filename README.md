@@ -27,6 +27,7 @@ Dies ist **OPTIONAL**.
 > `pip install selenium`
 >
 > Der Telegram-Bot ist optional. ist aber sehr praktisch, da man mitbekommt was das Programm macht.
+> Das Modul python-telegram-bot ist nur für den telegramIDcheker.py notwendig und kann danach wieder deinstalliert werden wenn gewünscht.
 >
 > `pip install python-telegram-bot`
 
