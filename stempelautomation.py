@@ -1,5 +1,6 @@
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.keys import Keys
+from datetime import datetime, timedelta
 from selenium import webdriver
 import requests
 import random
@@ -9,6 +10,8 @@ import os
 # Konstanten
 HOMEPAGE_GFN = "https://lernplattform.gfn.de/login/index.php"
 ZEITERFASSUNG_BEENDEN_LINK = "https://lernplattform.gfn.de/?stoppen=1"
+ANWESENHEIT_GFN = "https://lernplattform.gfn.de/local/anmeldung/anwesenheit.php"
+STARTSEITE_GFN = "https://lernplattform.gfn.de/"
 
 # Variablen
 uhrzeit_starten_H = 8 # Stunde Einstempeln
@@ -32,6 +35,63 @@ def pause(kategorie):
         warten = random.uniform(3.68, 3.98)
 
     time.sleep(warten)
+
+# Funktion gib das Datum des letzten vorherigen Arbeitstages im format dd.mm.yyyy zurück.
+def get_last_workday():
+    date = datetime.now()
+    weekday = date.weekday()
+
+    # Wenn Montag, springe zum Freitag der letzten Woche
+    if weekday == 0:
+        last_workday = date - timedelta(days=3)
+
+    # Für andere Tage einfach zurück auf den letzten Werktag
+    elif weekday == 6:  # Sonntag
+        last_workday = date - timedelta(days=2)
+
+    else:
+        last_workday = date - timedelta(days=1)
+
+    last_workday = last_workday.strftime("%d.%m.%Y")
+    return last_workday
+
+def gfn_stempeln_vortag_check():
+    try:
+        driver.get(ANWESENHEIT_GFN)
+        pause(2)
+
+        last_workday = get_last_workday()
+        trs = driver.find_elements("tag name", "tr")
+
+        for tr in trs:
+            tr_list = tr.text.split(" ")
+            if len(tr_list) == 6:
+                tr_datum, homeoffice, loginZeit, logoutZeit, korrektur_loginZeit, korrektur_logoutZeit = tr_list
+                if tr_datum == last_workday:
+                    if loginZeit != "--:--":
+                        if logoutZeit == "--:--":
+                            print("Ausstempeln gestern vergessen.")
+                            send_telegram_message("Ausstempeln gestern vergessen.")
+
+                        elif int(logoutZeit.replace(":", "")) >= 1630:
+                            print("Logout gestern Korrekt.")
+                            send_telegram_message("Logout gestern Korrekt.")
+
+                        else:
+                            print("Logout gestern zu früh.")
+                            send_telegram_message("Logout gestern zu früh.")
+
+                    else:
+                        print("Stempeln gestern komplett vergessen.")
+                        send_telegram_message("Stempeln gestern komplett vergessen.")
+
+                    break
+
+    except Exception as error:
+        print("gfn_stempeln_vortag_check Fehler", error)
+    
+    finally:
+        driver.get(STARTSEITE_GFN)
 
 def send_telegram_message(message):
     if telegram_api_token != "" or telegram_ID != "": # Wenn der User keine Telegram Notifications wünscht.
@@ -300,6 +360,8 @@ try:
             warten_auf_uhrzeit(uhrzeit_starten_H, uhrzeit_starten_M) # Vor Arbeitsbegin
             if browser_und_login() == True:
                 pause(2)
+                gfn_stempeln_vortag_check()
+
                 if zeiterfassung_starten() == True:
                     pause(2)
                     driver.quit()
@@ -320,4 +382,3 @@ finally:
         driver.quit()
 
     exit("Ende.")
-
