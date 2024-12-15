@@ -91,6 +91,7 @@ def gfn_stempeln_vortag_check():
         print("gfn_stempeln_vortag_check Fehler", error)
     
     finally:
+        time.sleep(2.5)
         driver.get(STARTSEITE_GFN)
 
 def send_telegram_message(message):
