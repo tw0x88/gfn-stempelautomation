@@ -1,3 +1,4 @@
 __pycache__/
 geckodriver.exe
+geckodriver.log
 credentials.py

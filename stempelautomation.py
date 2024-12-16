@@ -43,14 +43,14 @@ def get_last_workday():
 
     # Wenn Montag, springe zum Freitag der letzten Woche
     if weekday == 0:
-        last_workday = date - timedelta(days=3)
+        last_workday = date - timedelta(days = 3)
 
     # Für andere Tage einfach zurück auf den letzten Werktag
     elif weekday == 6:  # Sonntag
-        last_workday = date - timedelta(days=2)
+        last_workday = date - timedelta(days = 2)
 
     else:
-        last_workday = date - timedelta(days=1)
+        last_workday = date - timedelta(days = 1)
 
     last_workday = last_workday.strftime("%d.%m.%Y")
     return last_workday
@@ -70,20 +70,20 @@ def gfn_stempeln_vortag_check():
                 if tr_datum == last_workday:
                     if loginZeit != "--:--":
                         if logoutZeit == "--:--":
-                            print("Ausstempeln gestern vergessen.")
-                            send_telegram_message("Ausstempeln gestern vergessen.")
+                            print("Ausstempeln am letzten Arbeitstag vergessen.")
+                            send_telegram_message("Ausstempeln am letzten Arbeitstag vergessen.")
 
                         elif int(logoutZeit.replace(":", "")) >= 1630:
-                            print("Logout gestern Korrekt.")
-                            send_telegram_message("Logout gestern Korrekt.")
+                            print("Logout am letzten Arbeitstag Korrekt.")
+                            send_telegram_message("Logout am letzten Arbeitstag Korrekt.")
 
                         else:
-                            print("Logout gestern zu früh.")
-                            send_telegram_message("Logout gestern zu früh.")
+                            print("Logout am letzten Arbeitstag zu früh.")
+                            send_telegram_message("Logout am letzten Arbeitstag zu früh.")
 
                     else:
-                        print("Stempeln gestern komplett vergessen.")
-                        send_telegram_message("Stempeln gestern komplett vergessen.")
+                        print("Stempeln am letzten Arbeitstag komplett vergessen.")
+                        send_telegram_message("Stempeln am letzten Arbeitstag komplett vergessen.")
 
                     break
 
@@ -239,6 +239,7 @@ def browser_und_login():
 
         else:
             return False
+
         
     except Exception as error:
         print("browser_und_login Fehler!", error)
@@ -260,9 +261,15 @@ def popup_handle():
 def zeiterfassung_starten():
     try:
         time.sleep(1)
-        stempler_rausholen = driver.find_element("css selector", "#topofscroll > div.drawer-toggles.d-flex > div > button")
-        stempler_rausholen.click()
-        time.sleep(0.3)
+        try:
+            # Dieser try-Block ist wegen der inkonsistenz der GFN Webseite. Mal ist der Stempelbereich schon offen mal nicht.
+            # Dementsprechend ist der Butten da oder nicht.
+            stempler_rausholen = driver.find_element("css selector", "#topofscroll > div.drawer-toggles.d-flex > div > button")
+            stempler_rausholen.click()
+            time.sleep(0.3)
+        
+        except:
+            pass
 
         aktueller_Wochentag = int(time.strftime("%u")) # 1 = Montag - 7 = Sonntag
         if aktueller_Wochentag <= 5: # Zeiterfassung soll natürlich nur zwischen Montag und Freitag gestartet werden.
@@ -354,11 +361,10 @@ def warten_auf_uhrzeit(hour, minute):
 try:
     os.system("cls") # Bereinigt die Terminalausgabe.
     if abfrage_userdaten() == True:
-        print("Telegram-Funktionstest.")
         send_telegram_message("Funktionstest!")
         while system_running == True:
             # Einstempeln
-            warten_auf_uhrzeit(uhrzeit_starten_H, uhrzeit_starten_M) # Vor Arbeitsbegin
+            #warten_auf_uhrzeit(uhrzeit_starten_H, uhrzeit_starten_M) # Vor Arbeitsbegin
             if browser_und_login() == True:
                 pause(2)
                 gfn_stempeln_vortag_check()
@@ -374,6 +380,12 @@ try:
                         if zeiterfassung_beenden() == True:
                             pause(2)
                             driver.quit()
+
+            time.sleep(10) # Browser noch etwas offen lassen.
+            if driver:
+                driver.quit()
+
+            time.sleep(180) # Dead Loop Sicherung
 
 except Exception as error:
     print("Programm Fehler!", error)
