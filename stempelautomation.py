@@ -364,7 +364,7 @@ try:
         send_telegram_message("Funktionstest!")
         while system_running == True:
             # Einstempeln
-            #warten_auf_uhrzeit(uhrzeit_starten_H, uhrzeit_starten_M) # Vor Arbeitsbegin
+            warten_auf_uhrzeit(uhrzeit_starten_H, uhrzeit_starten_M) # Vor Arbeitsbegin
             if browser_und_login() == True:
                 pause(2)
                 gfn_stempeln_vortag_check()
