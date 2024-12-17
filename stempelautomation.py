@@ -14,11 +14,6 @@ ANWESENHEIT_GFN = "https://lernplattform.gfn.de/local/anmeldung/anwesenheit.php"
 STARTSEITE_GFN = "https://lernplattform.gfn.de/"
 
 # Variablen
-uhrzeit_starten_H = 8 # Stunde Einstempeln
-uhrzeit_starten_M = random.randint(18, 27) # Timerange zum einstempeln um Automation zu verschleiern.
-uhrzeit_beenden_H = 16 # Stunde Ausstempeln
-uhrzeit_beenden_M = random.randint(32, 36) # Timerange zum ausstempeln um Automation zu verschleiern.
-
 driver = None
 system_running = True
 
@@ -363,6 +358,12 @@ try:
     if abfrage_userdaten() == True:
         send_telegram_message("Funktionstest!")
         while system_running == True:
+            #Stempeluhrzeiten
+            uhrzeit_starten_H = 8 # Stunde Einstempeln
+            uhrzeit_starten_M = random.randint(18, 27)
+            uhrzeit_beenden_H = 16 # Stunde Ausstempeln
+            uhrzeit_beenden_M = random.randint(32, 36)
+
             # Einstempeln
             warten_auf_uhrzeit(uhrzeit_starten_H, uhrzeit_starten_M) # Vor Arbeitsbegin
             if browser_und_login() == True:
