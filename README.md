@@ -38,3 +38,7 @@ Dies ist **OPTIONAL**.
 > 3. Hol dir den API Token.
 > 4. Sende eine Nachricht an deinen Bot.
 > 5. Im Repository liegt eine telegramIDcheker.py, führe sie aus um deine Telegram-ID auszulesen.
+
+# Telegram Notification Beispiel
+
+> ![Telegram Notification Beispiel](https://github.com/tw0x88/gfn-stempelautomation/blob/06d5c154dbfcd277ed5b8c0cf5b731943b3d46df/readme_images/telegram_bsp.jpg)
